@@ -1,60 +1,83 @@
 // Mostramos por consola una tabla de estudiantes para verificar todo OK
-console.table(students)
+console.table(producto)
+
+
 // Declaramos las variables que vamos a utilizar
-let contenedorAlumnos = document.getElementById('misAlumnos');
-let contenedorTotal = document.getElementById('total');
 let contenedorNombre = document.getElementById('nombre');
 let contenedorPassword = document.getElementById('password');
-
-
+let contenedorCard = document.getElementById('card')
+let contenedorBusqueda = document.getElementById('busqueda')
+let contenedorCarrito = document.getElementById('carrito')
+let contenedorLogin = document.getElementById('login')
+let contenedorNombreLogin = document.getElementById('nombreLogin')
+let contenedorPasswordLogin = document.getElementById('passwordLogin')
+let contenedorCarritoTotal = document.getElementById('carritoTotal')
 // Por defecto llamamos a la funcion para siempre mostrar los estudiantes al comienzo
 //renderizarAlumnos(students)
+renderizarProductos(producto)
 
 
 
+const carro = JSON.parse(localStorage.getItem('carro')) 
+    renderizarProductosCarro(carro)
 
+|| [];
 
-// Esta funcion renderiza los alumnos por medio de un for of 
+// Esta funcion renderiza los productos por medio de un for of 
 
-function renderizarAlumnos(lista){
-    contenedorAlumnos.innerHTML = '';
-    for(const alumno of lista){
-        contenedorAlumnos.innerHTML += `
-            <td>${alumno.id}</td>
-            <td>${alumno.name}</td>
-            <td>${alumno.age}</td>
-            <td>${alumno.note}</td>
-            <td>${alumno.genre}</td>
+function renderizarProductos(lista){
+    contenedorCard.innerHTML = '';
+    for(const product of lista){
+        contenedorCard.innerHTML += `
+        <div class="card col-sm-2 m-3" style="width:18rem">
+            <img src="${product.image}" class="card-img-top" alt="...">
+            <div class="card-body">
+            <h5 class="card-title" id="card-h5">${product.name}</h5>
+            <h4 class="card-title">${product.price}</h4>
+            <p class="card-text">${product.description}</p>
+            <button id="${product.id}" class="btn btn-primary compra">Agregar al carrito</button>
+            </div>
+        </div>
         `
     }
     
 }
-
-
-
-// Esta funcion Vuelve a renderizar los alumnos
-function mostrarAlumnos(){
-    renderizarAlumnos(students)
+// Esta funcion muestra los productos del carrito
+function renderizarProductosCarro(lista){
+    contenedorCarrito.innerHTML = '';
+    for(const product of lista){
+        contenedorCarrito.innerHTML += `
+        <div class="card col-sm-2 m-3" style="width:18rem">
+            <img src="${product.image}" class="card-img-top" alt="...">
+            <div class="card-body">
+            <h5 class="card-title" id="card-h5">${product.name}</h5>
+            <h4 class="card-title">${product.price}</h4>
+            <p class="card-text">${product.description}</p>
+            <button id="${product.id}" class="btn btn-danger compra">Borrar</button>
+            </div>
+        </div>
+        `
+    }
+    contenedorCarritoTotal.innerHTML= `Total: ${localStorage.getItem('total')}`    
 }
 
 
 // Esta funcion filtrara por nota maxima
-function filtrarPorNota(note){
-    const filtrados = students.filter((item)=>item.note <= note);
+function filtrarPorPrecio(price){
+    const filtrados = producto.filter((item)=>item.price <= price);
     return filtrados;
 }
 
 // Esta funcion nos pide por medio de un prompt, que carguemos la nota maxima y hara los filtros
-function filtrarPorNotaButton(){
-    contenedorAlumnos.innerHTML=''
-        notaMax = parseFloat(prompt('Ingresa la nota maxima'));
+function filtrarPorPrecioButton(){
+    contenedorCard.innerHTML=''
+        notaMax = contenedorBusqueda.value //parseFloat(prompt('Ingresa el precio maximo'));
         if(isNaN(notaMax) || notaMax < 0){
             alert('Ingrese un numero valido')
         }else{
-            const alumnosFiltrados = filtrarPorNota(notaMax);
+            const alumnosFiltrados = filtrarPorPrecio(notaMax);
             console.table(alumnosFiltrados);
-            renderizarAlumnos(alumnosFiltrados)
-    
+            renderizarProductos(alumnosFiltrados)
         }
 }
 
@@ -74,8 +97,11 @@ function enviarDatos(){
         alert('Error cargue los campos')
     }else{
         alert(`Bienvenido ${contenedorNombre.value} su contraseña es ${contenedorPassword.value}`)
-        localStorage.setItem('nombre',contenedorNombre.value) // Guardamos en el localStorage el nombre de usuario
-        localStorage.setItem('password',contenedorPassword.value) // Guardamos en el localStorage el password de usuario
+        let usuario ={
+            nombre:contenedorNombre.value,
+            password:contenedorPassword.value,
+        }
+        localStorage.setItem('usuario',JSON.stringify(usuario))
         borrarCampos()   // Borramos los campos una vez enviados
     }
 
@@ -83,76 +109,67 @@ function enviarDatos(){
 
 
 // Funcion para encontrar al alumno por nombre, el nombre ingresado es pasado a mayuscula
-function encontrarAlumnoNombre(nombreIngresado){
-    const encontrado = students.find((student)=> student.name.toUpperCase() === nombreIngresado)
-    console.log(encontrado)
-    if(encontrado){
-        console.table(encontrado)
-    }
-    else{
-        console.log('Alumno no encontrado')
-    }
-}
 
-
-function filtrarPorOrdenAsc(){
-    students.sort((a,b)=> a.note - b.note)
-    console.table(students)
-}
-
-
-
-// Constructores
-
-
-function Alumno(id,name,age,note,genre){
-    this.id = id;
-    this.name = name;
-    this.age = age;
-    this.note = note;
-    this.genre = genre;
-}
-
-const alumno1 = new Alumno(1,"Juan",18,10,"M")
-
-console.log(alumno1)
-
-// Clases
-
-class Alumno{
-    constructor(alumno){
-        this.id = alumno.id;
-        this.name = alumno.name;
-        this.age = alumno.age;
-        this.note = alumno.note;
-        this.genre = alumno.genre;
-    }
-}
-
-
-
-//Menu
-
-function main(){
-    let opcion
-    let nombre;
-    do{
-        opcion = parseInt(prompt('Bienvenido eliga una opcion!!!\n1.Mostrar tabla\n2.Filtrar por notas\n3.Encontrar alumno por nombre\n4.Ordenar de menor a mayor nota\n5.Salir'))
-        switch(opcion){
-            case 1:
-                    console.table(students)
-            break;
-            case 2:
-                filtrarPorNotaButton();
-            break;
-            case 3:
-                nombre = prompt('Escriba el nombre del alumno').toUpperCase().trim()
-                encontrarAlumnoNombre(nombre)
-            break;
-            case 4:
-                filtrarPorOrdenAsc()    
-            break;
+function encontrarProductoNombre(){
+    nombreIngresado = contenedorBusqueda.value;
+    if(nombreIngresado!= ''  && nombreIngresado==String && nombreIngresado != Number){
+        const encontrado = producto.filter((producto)=> producto.name.toUpperCase().includes(nombreIngresado.toUpperCase()))
+        if(encontrado){
+            renderizarProductos(encontrado)
+            //console.table(encontrado)
         }
-    }while(opcion!=5);
+        else{
+            contenedorCard.innerHTML='No encontrado'
+        }
+    }else{
+        if(nombreIngresado==Number)
+        filtrarPorPrecioButton()
+    }
+    //console.log(encontrado)
+
 }
-//main()
+// Borramos el filtro de busqueda
+function borrarFiltros(){
+    contenedorBusqueda.value = ''
+    renderizarProductos(producto)
+}
+
+
+// Evento practicado, en donde agragamos productos al carrito
+let botones  = document.getElementsByClassName('compra');
+for(const boton of botones){
+    boton.addEventListener('click',()=>{
+        const prodACarro = producto.find((item)=>item.id == boton.id);
+        console.log(prodACarro);
+        agregarACarrito(prodACarro);
+    })
+}
+
+// funcion donde agregamos productos al carrito
+function agregarACarrito(item){
+    carro.push(item)
+    console.table(carro);
+    let total = carro.reduce((ac,producto)=> ac + producto.price,0)
+    localStorage.setItem('carro',JSON.stringify(carro)) // cargamos el objeto al localStorage
+    localStorage.setItem('total',total) // Cargamos el total del carrito al localStorage
+}
+
+
+// Esta funcion sirve para logearse, en caso de encontrar un usuario que coincida, muestra un alert y pasa un 1 al localStorage
+function enviarDatosLogin(){
+    const valor = JSON.parse(localStorage.getItem('usuario')) 
+    if(valor){
+        let usuarioL ={
+            nombre:contenedorNombreLogin.value,
+            password:contenedorPasswordLogin.value,
+        }
+        if(valor.nombre === usuarioL.nombre && valor.password === usuarioL.password){
+            alert('Se logeo correctamente')
+            localStorage.setItem('login',1)
+            contenedorNombreLogin.value = ''
+            contenedorPasswordLogin.value = ''
+        }else{
+            alert('credencial invalida')
+        }
+    }
+}
